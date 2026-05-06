@@ -1,11 +1,71 @@
 # ccs - Claude Code Provider Switcher
 
-A command-line utility to switch between different Claude API providers in Claude Code CLI.
+[![Lint](https://github.com/kmmuntasir/ccs/actions/workflows/lint.yml/badge.svg)](https://github.com/kmmuntasir/ccs/actions/workflows/lint.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/kmmuntasir/ccs)](https://github.com/kmmuntasir/ccs/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/kmmuntasir/ccs)](https://github.com/kmmuntasir/ccs/issues)
+[![Shell Script](https://img.shields.io/badge/language-bash-4EAA25.svg)](https://www.gnu.org/software/bash/)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
+
+> One command to switch between Claude API providers in Claude Code CLI.
+
+## Why ccs?
+
+If you use multiple Claude API providers (Anthropic, OpenRouter, Z.AI, etc.), switching between them means manually editing `~/.claude/settings.json` every time. CCS makes this a single command.
+
+## Demo
+
+```console
+$ ccs
+
+==============================
+  Claude Provider Switcher
+==============================
+
+Available providers:
+
+  1) Z.AI (GLM)  [ACTIVE]
+     Default: opus | Top model: glm-5.1
+     URL: https://api.z.ai/api/anthropic
+
+  2) AgentRouter (Claude)
+     Default: haiku | Top model: claude-opus-4-6
+     URL: https://agentrouter.org/
+
+  T) Toggle providers
+  +) Add provider
+  M) Modify provider
+  R) Remove provider
+  0) Exit
+
+Select provider [0-T]:
+```
+
+## Features
+
+- **Interactive menu** — switch providers, toggle visibility, add/modify/remove entries
+- **11 pre-configured providers** — Anthropic, Z.AI, DeepSeek, Qwen, Kimi, and more
+- **Zero config editing** — manage everything from the CLI (`ccs add`, `ccs modify`, `ccs remove`)
+- **Auto-installs dependencies** — `jq` is installed automatically via your package manager
+- **Cross-shell support** — bash, zsh, and fish
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Included Providers](#included-providers)
+- [Claude Code Settings](#claude-code-settings)
+- [Uninstallation](#uninstallation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Changelog](CHANGELOG.md)
 
 ## Requirements
 
-- [jq](https://jqlang.github.io/jq/) - JSON processor (installed automatically by the installer)
-- [git](https://git-scm.com/) - required for both quick install and manual install method.
+- [jq](https://jqlang.github.io/jq/) — JSON processor (installed automatically by the installer)
+- [git](https://git-scm.com/) — required for both quick install and manual install method
 - Claude Code CLI installed
 
 ## Installation
@@ -54,30 +114,6 @@ The installer will:
 ccs
 ```
 
-Shows an interactive menu:
-
-```
-==============================
-  Claude Provider Switcher
-==============================
-
-Available providers:
-
-  1) Z.AI (GLM)  [ACTIVE]
-     Default: opus | Top model: glm-5.1
-     URL: https://api.z.ai/api/anthropic
-
-  2) AgentRouter (Claude)
-     Default: haiku | Top model: claude-opus-4-6
-     URL: https://agentrouter.org/
-
-  T) Toggle providers
-  +) Add provider
-  M) Modify provider
-  R) Remove provider
-  0) Exit
-```
-
 The menu only shows enabled providers. Use `T` to toggle which providers are visible.
 
 ### Command-Line Arguments
@@ -103,7 +139,7 @@ Notes:
 - You cannot remove the currently active provider (switch away first)
 - URLs are automatically normalized with a trailing slash
 
-### Configuration
+## Configuration
 
 Edit `~/.ccs/config.json`:
 
@@ -141,7 +177,7 @@ Edit `~/.ccs/config.json`:
 
 ## Included Providers
 
-Template includes 11 providers (all disabled by default - enable them and add your API keys):
+Template includes 11 providers (all disabled by default — enable them and add your API keys):
 
 | Provider | Key | URL |
 |----------|-----|-----|
@@ -181,9 +217,9 @@ After switching, `~/.claude/settings.json` is updated with:
 ```
 
 The template also sets these optional env vars:
-- `CLAUDE_CODE_DISABLE_1M_CONTEXT` - Disables 1M context window
-- `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` - Blocks non-essential network requests
-- `DISABLE_TELEMETRY` - Disables telemetry
+- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — disables 1M context window
+- `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` — blocks non-essential network requests
+- `DISABLE_TELEMETRY` — disables telemetry
 
 These are set in the initial `settings.template.json` and are not modified by provider switching. Edit `~/.claude/settings.json` directly to change them.
 
@@ -207,6 +243,46 @@ rm -rf ~/.ccs
 
 Note: This does not remove `~/.claude/settings.json`.
 
+## Troubleshooting
+
+<details>
+<summary><strong>jq not found</strong></summary>
+
+CCS requires `jq`. Re-run the installer or install manually:
+
+```bash
+brew install jq          # macOS
+sudo apt install jq      # Linux
+```
+
+</details>
+
+<details>
+<summary><strong>ccs: command not found</strong></summary>
+
+The shell function wasn't added or your shell wasn't restarted:
+
+```bash
+source ~/.bashrc   # or ~/.zshrc
+```
+
+</details>
+
+<details>
+<summary><strong>Settings not taking effect</strong></summary>
+
+Restart Claude Code after switching providers.
+
+</details>
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Acknowledgments
+
+Built with [jq](https://jqlang.github.io/jq/) and [ShellCheck](https://www.shellcheck.net/).
+
 ## License
 
-GNU General Public License v3 (GPLv3)
+[GNU General Public License v3](LICENSE)

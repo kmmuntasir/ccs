@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CCS_DIR="$HOME/.ccs"
@@ -37,7 +38,6 @@ remove_alias() {
 
 remove_alias "$HOME/.bashrc"
 remove_alias "$HOME/.zshrc"
-remove_alias "$HOME/.fish"
 
 if [[ -f "$HOME/.config/fish/config.fish" ]]; then
     remove_alias "$HOME/.config/fish/config.fish"

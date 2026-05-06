@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash disable=SC2207
 
 CCS_DIR="$HOME/.ccs"
 CONFIG="$CCS_DIR/config.json"
@@ -405,12 +406,14 @@ remove_provider() {
         fi
     fi
 
-    local label=$(jq -r ".providers.$target.label" "$CONFIG")
-    local url=$(jq -r ".providers.$target.base_url" "$CONFIG")
-    local dm=$(jq -r ".providers.$target.default_model" "$CONFIG")
+    local label url dm
+    label=$(jq -r ".providers.$target.label" "$CONFIG")
+    url=$(jq -r ".providers.$target.base_url" "$CONFIG")
+    dm=$(jq -r ".providers.$target.default_model" "$CONFIG")
 
     # Check if this is the currently active provider
-    local current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
+    local current_base_url
+    current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
     if [[ "$current_base_url" == "$url" ]]; then
         echo ""
         echo "Error: '$label' is the currently active provider."
@@ -498,14 +501,15 @@ modify_provider() {
         fi
     fi
 
-    local cur_label=$(jq -r ".providers.$target.label" "$CONFIG")
-    local cur_token=$(jq -r ".providers.$target.auth_token" "$CONFIG")
-    local cur_url=$(jq -r ".providers.$target.base_url" "$CONFIG")
-    local cur_haiku=$(jq -r ".providers.$target.haiku_model" "$CONFIG")
-    local cur_sonnet=$(jq -r ".providers.$target.sonnet_model" "$CONFIG")
-    local cur_opus=$(jq -r ".providers.$target.opus_model" "$CONFIG")
-    local cur_default=$(jq -r ".providers.$target.default_model" "$CONFIG")
-    local cur_enabled=$(jq -r ".providers.$target.enabled" "$CONFIG")
+    local cur_label cur_token cur_url cur_haiku cur_sonnet cur_opus cur_default cur_enabled
+    cur_label=$(jq -r ".providers.$target.label" "$CONFIG")
+    cur_token=$(jq -r ".providers.$target.auth_token" "$CONFIG")
+    cur_url=$(jq -r ".providers.$target.base_url" "$CONFIG")
+    cur_haiku=$(jq -r ".providers.$target.haiku_model" "$CONFIG")
+    cur_sonnet=$(jq -r ".providers.$target.sonnet_model" "$CONFIG")
+    cur_opus=$(jq -r ".providers.$target.opus_model" "$CONFIG")
+    cur_default=$(jq -r ".providers.$target.default_model" "$CONFIG")
+    cur_enabled=$(jq -r ".providers.$target.enabled" "$CONFIG")
 
     echo ""
     echo "Modifying: $cur_label ($target)"
@@ -597,15 +601,18 @@ modify_provider() {
 }
 
 show_current() {
-    local current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
+    local current_base_url
+    current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
     all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
 
     for key in "${all_keys[@]}"; do
-        local url=$(jq -r ".providers.$key.base_url" "$CONFIG")
+        local url
+        url=$(jq -r ".providers.$key.base_url" "$CONFIG")
         if [[ "$current_base_url" == "$url" ]]; then
-            local label=$(jq -r ".providers.$key.label" "$CONFIG")
-            local dm=$(jq -r ".providers.$key.default_model" "$CONFIG")
-            local om=$(jq -r ".providers.$key.opus_model" "$CONFIG")
+            local label dm om
+            label=$(jq -r ".providers.$key.label" "$CONFIG")
+            dm=$(jq -r ".providers.$key.default_model" "$CONFIG")
+            om=$(jq -r ".providers.$key.opus_model" "$CONFIG")
             echo ""
             echo "  $label ($key)"
             echo "  URL: $url"
@@ -680,6 +687,15 @@ toggle_providers() {
     toggle_providers
 }
 
+show_version() {
+    local version_file="$(cd "$(dirname "$0")" && pwd)/VERSION"
+    if [[ -f "$version_file" ]]; then
+        echo "ccs $(cat "$version_file" | tr -d '[:space:]')"
+    else
+        echo "ccs (version unknown)"
+    fi
+}
+
 show_help() {
     echo "ccs - Claude Code Provider Switcher"
     echo ""
@@ -694,11 +710,17 @@ show_help() {
     echo "  modify [key]    Modify a provider (interactive if no key given)"
     echo "  remove [key]    Remove a provider (interactive if no key given)"
     echo "  current         Show the currently active provider"
+    echo "  -v, --version   Show version"
     echo "  -h, --help      Show this help message"
 }
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     show_help
+    exit 0
+fi
+
+if [[ "${1:-}" == "-v" || "${1:-}" == "--version" ]]; then
+    show_version
     exit 0
 fi
 

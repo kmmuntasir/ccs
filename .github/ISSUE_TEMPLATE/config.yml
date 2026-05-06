@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/kmmuntasir/ccs#readme
+    about: Check the README for usage instructions and configuration details.
+  - name: Question
+    url: https://github.com/kmmuntasir/ccs/discussions
+    about: Ask a question or start a discussion.
+  - name: Security Vulnerability
+    url: https://github.com/kmmuntasir/ccs/security/advisories/new
+    about: Report security issues privately.

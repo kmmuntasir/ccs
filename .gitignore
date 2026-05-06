@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# User config (never commit real keys)
+config.json
+settings.json
+
+# Temporary files
+*.tmp
+*.bak
+
+# Distribution/install artifacts
+dist/
+
+# Test artifacts
+test-results/

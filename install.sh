@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash
 
 set -e
 
@@ -85,7 +86,6 @@ echo "Adding 'ccs' alias to shell configuration files..."
 
 add_alias "$HOME/.bashrc"
 add_alias "$HOME/.zshrc"
-add_alias "$HOME/.fish"
 
 if [[ -d "$HOME/.config/fish" ]]; then
     add_alias "$HOME/.config/fish/config.fish"
