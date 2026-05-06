@@ -153,6 +153,8 @@ show_menu() {
 
     echo "  T) Toggle providers"
     echo "  +) Add provider"
+    echo "  M) Modify provider"
+    echo "  R) Remove provider"
     echo "  0) Exit"
     echo ""
 
@@ -170,6 +172,16 @@ show_menu() {
 
     if [[ "$choice" == "+" ]]; then
         add_provider
+        return
+    fi
+
+    if [[ "$choice" == "M" || "$choice" == "m" ]]; then
+        modify_provider
+        return
+    fi
+
+    if [[ "$choice" == "R" || "$choice" == "r" ]]; then
+        remove_provider
         return
     fi
 
@@ -335,6 +347,246 @@ add_provider() {
     echo ""
 }
 
+remove_provider() {
+    local target="$1"
+    all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
+
+    if [[ ${#all_keys[@]} -eq 0 ]]; then
+        echo "Error: No providers to remove."
+        exit 1
+    fi
+
+    if [[ -z "$target" ]]; then
+        echo ""
+        echo "=============================="
+        echo "  Remove Provider"
+        echo "=============================="
+        echo ""
+
+        i=1
+        for key in "${all_keys[@]}"; do
+            label=$(jq -r ".providers.$key.label" "$CONFIG")
+            enabled=$(jq -r ".providers.$key.enabled" "$CONFIG")
+            if [[ "$enabled" == "true" ]]; then
+                echo "  $i) $label  [ENABLED]"
+            else
+                echo "  $i) $label  [disabled]"
+            fi
+            ((i++))
+        done
+
+        echo "  0) Cancel"
+        echo ""
+
+        read -rp "Select provider to remove [0-$((i-1))]: " choice
+
+        if [[ "$choice" == "0" || -z "$choice" ]]; then
+            echo "Cancelled."
+            exit 0
+        fi
+
+        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
+            echo "Error: Invalid selection."
+            exit 1
+        fi
+
+        target="${all_keys[$((choice-1))]}"
+    else
+        local found=false
+        for key in "${all_keys[@]}"; do
+            if [[ "$key" == "$target" ]]; then
+                found=true
+                break
+            fi
+        done
+        if [[ "$found" == "false" ]]; then
+            echo "Error: Unknown provider '$target'."
+            exit 1
+        fi
+    fi
+
+    local label=$(jq -r ".providers.$target.label" "$CONFIG")
+    local url=$(jq -r ".providers.$target.base_url" "$CONFIG")
+    local dm=$(jq -r ".providers.$target.default_model" "$CONFIG")
+
+    echo ""
+    echo "About to remove:"
+    echo "  Key: $target"
+    echo "  Label: $label"
+    echo "  URL: $url"
+    echo "  Default: $dm"
+    echo ""
+    read -rp "Are you sure? [y/N]: " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "Cancelled."
+        exit 0
+    fi
+
+    tmp=$(mktemp)
+    jq --arg key "$target" 'del(.providers[$key])' "$CONFIG" > "$tmp"
+    mv "$tmp" "$CONFIG"
+
+    echo ""
+    echo "Removed: $label ($target)"
+    echo ""
+}
+
+modify_provider() {
+    local target="$1"
+    all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
+
+    if [[ ${#all_keys[@]} -eq 0 ]]; then
+        echo "Error: No providers to modify."
+        exit 1
+    fi
+
+    if [[ -z "$target" ]]; then
+        echo ""
+        echo "=============================="
+        echo "  Modify Provider"
+        echo "=============================="
+        echo ""
+
+        i=1
+        for key in "${all_keys[@]}"; do
+            label=$(jq -r ".providers.$key.label" "$CONFIG")
+            enabled=$(jq -r ".providers.$key.enabled" "$CONFIG")
+            if [[ "$enabled" == "true" ]]; then
+                echo "  $i) $label  [ENABLED]"
+            else
+                echo "  $i) $label  [disabled]"
+            fi
+            ((i++))
+        done
+
+        echo "  0) Cancel"
+        echo ""
+
+        read -rp "Select provider to modify [0-$((i-1))]: " choice
+
+        if [[ "$choice" == "0" || -z "$choice" ]]; then
+            echo "Cancelled."
+            exit 0
+        fi
+
+        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
+            echo "Error: Invalid selection."
+            exit 1
+        fi
+
+        target="${all_keys[$((choice-1))]}"
+    else
+        local found=false
+        for key in "${all_keys[@]}"; do
+            if [[ "$key" == "$target" ]]; then
+                found=true
+                break
+            fi
+        done
+        if [[ "$found" == "false" ]]; then
+            echo "Error: Unknown provider '$target'."
+            exit 1
+        fi
+    fi
+
+    local cur_label=$(jq -r ".providers.$target.label" "$CONFIG")
+    local cur_token=$(jq -r ".providers.$target.auth_token" "$CONFIG")
+    local cur_url=$(jq -r ".providers.$target.base_url" "$CONFIG")
+    local cur_haiku=$(jq -r ".providers.$target.haiku_model" "$CONFIG")
+    local cur_sonnet=$(jq -r ".providers.$target.sonnet_model" "$CONFIG")
+    local cur_opus=$(jq -r ".providers.$target.opus_model" "$CONFIG")
+    local cur_default=$(jq -r ".providers.$target.default_model" "$CONFIG")
+    local cur_enabled=$(jq -r ".providers.$target.enabled" "$CONFIG")
+
+    echo ""
+    echo "Modifying: $cur_label ($target)"
+    echo "Press Enter to keep current value."
+    echo ""
+
+    read -rp "Label [$cur_label]: " new_label
+    new_label="${new_label:-$cur_label}"
+
+    read -rp "Auth token [**********]: " new_token
+    new_token="${new_token:-$cur_token}"
+
+    read -rp "Base URL [$cur_url]: " new_url
+    new_url="${new_url:-$cur_url}"
+    if [[ "${new_url: -1}" != "/" ]]; then
+        new_url="${new_url}/"
+    fi
+
+    read -rp "Haiku model ID [$cur_haiku]: " new_haiku
+    new_haiku="${new_haiku:-$cur_haiku}"
+
+    read -rp "Sonnet model ID [$cur_sonnet]: " new_sonnet
+    new_sonnet="${new_sonnet:-$cur_sonnet}"
+
+    read -rp "Opus model ID [$cur_opus]: " new_opus
+    new_opus="${new_opus:-$cur_opus}"
+
+    while true; do
+        read -rp "Default model tier (haiku/sonnet/opus) [$cur_default]: " new_default
+        new_default="${new_default:-$cur_default}"
+        case "$new_default" in
+            haiku|sonnet|opus) break ;;
+            *) echo "Error: Must be haiku, sonnet, or opus." ;;
+        esac
+    done
+
+    local enabled_str="enabled"
+    if [[ "$cur_enabled" == "false" ]]; then
+        enabled_str="disabled"
+    fi
+    read -rp "Enabled (true/false) [$enabled_str]: " new_enabled
+    if [[ -z "$new_enabled" ]]; then
+        new_enabled="$cur_enabled"
+    fi
+
+    echo ""
+    echo "Changes for '$target':"
+    [[ "$new_label" != "$cur_label" ]] && echo "  label: $cur_label -> $new_label"
+    [[ "$new_token" != "$cur_token" ]] && echo "  auth_token: ********** -> **********"
+    [[ "$new_url" != "$cur_url" ]] && echo "  base_url: $cur_url -> $new_url"
+    [[ "$new_haiku" != "$cur_haiku" ]] && echo "  haiku_model: $cur_haiku -> $new_haiku"
+    [[ "$new_sonnet" != "$cur_sonnet" ]] && echo "  sonnet_model: $cur_sonnet -> $new_sonnet"
+    [[ "$new_opus" != "$cur_opus" ]] && echo "  opus_model: $cur_opus -> $new_opus"
+    [[ "$new_default" != "$cur_default" ]] && echo "  default_model: $cur_default -> $new_default"
+    [[ "$new_enabled" != "$cur_enabled" ]] && echo "  enabled: $cur_enabled -> $new_enabled"
+
+    echo ""
+    read -rp "Apply changes? [y/N]: " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "Cancelled."
+        exit 0
+    fi
+
+    tmp=$(mktemp)
+    jq --arg key "$target" \
+       --arg label "$new_label" \
+       --arg token "$new_token" \
+       --arg url "$new_url" \
+       --arg haiku "$new_haiku" \
+       --arg sonnet "$new_sonnet" \
+       --arg opus "$new_opus" \
+       --arg default "$new_default" \
+       --argjson enabled "$new_enabled" \
+       '.providers[$key] = {
+           "label": $label,
+           "enabled": $enabled,
+           "auth_token": $token,
+           "base_url": $url,
+           "haiku_model": $haiku,
+           "sonnet_model": $sonnet,
+           "opus_model": $opus,
+           "default_model": $default
+       }' "$CONFIG" > "$tmp"
+    mv "$tmp" "$CONFIG"
+
+    echo ""
+    echo "Updated: $new_label ($target)"
+    echo ""
+}
+
 toggle_providers() {
     all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
 
@@ -423,6 +675,10 @@ if [[ $# -gt 0 ]]; then
         toggle_providers
     elif [[ "$arg" == "add" ]]; then
         add_provider
+    elif [[ "$arg" == "modify" ]]; then
+        modify_provider "$2"
+    elif [[ "$arg" == "remove" ]]; then
+        remove_provider "$2"
     else
         switch_to_provider "$arg"
     fi

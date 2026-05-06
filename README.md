@@ -55,6 +55,8 @@ Available providers:
 
   T) Toggle providers
   +) Add provider
+  M) Modify provider
+  R) Remove provider
   0) Exit
 ```
 
@@ -63,10 +65,14 @@ Available providers:
 Switch to a provider by key or number:
 
 ```bash
-ccs glm       # Switch to provider by key
-ccs 2         # Switch to provider by number
-ccs T         # Toggle providers
-ccs add       # Interactively add a new provider
+ccs glm           # Switch to provider by key
+ccs 2             # Switch to provider by number
+ccs T             # Toggle providers
+ccs add           # Interactively add a new provider
+ccs modify        # Select and modify a provider interactively
+ccs modify glm    # Modify a specific provider by key
+ccs remove        # Select and remove a provider interactively
+ccs remove glm    # Remove a specific provider by key
 ```
 
 ### Configuration
