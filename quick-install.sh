@@ -13,7 +13,8 @@ trap cleanup EXIT
 
 if ! command -v git &>/dev/null; then
     echo "Error: git is required but not installed."
-    echo "Install it from https://git-scm.com/book/en/v2/Getting-Started-Installing-Git"
+    echo "Install it from:"
+    echo "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git"
     exit 1
 fi
 

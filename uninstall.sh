@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CCS_DIR="$HOME/.ccs"
 
 echo "=============================="
@@ -27,7 +26,8 @@ remove_alias() {
         return
     fi
 
-    local tmp=$(mktemp)
+    local tmp
+    tmp=$(mktemp)
     if grep -v '^ccs()' "$rc_file" > "$tmp"; then
         mv "$tmp" "$rc_file"
         echo "Removed from $rc_file"

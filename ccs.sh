@@ -7,7 +7,9 @@ SETTINGS="$HOME/.claude/settings.json"
 
 switch_to_provider() {
     local selection="$1"
-    enabled_keys=($(jq -r '.providers | to_entries[] | select(.value.enabled == true) | .key' "$CONFIG"))
+    enabled_keys=($(jq -r \
+        '.providers | to_entries[] | select(.value.enabled == true) | .key' \
+        "$CONFIG"))
     all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
 
     if [[ ${#enabled_keys[@]} -eq 0 ]]; then
@@ -38,7 +40,8 @@ switch_to_provider() {
     done
 
     if [[ "$is_enabled" == "false" ]]; then
-        echo "Error: Provider '$selection' is disabled. Run 'ccs T' to enable it."
+        echo "Error: Provider '$selection' is disabled."
+        echo "Run 'ccs T' to enable it."
         exit 1
     fi
 
@@ -52,10 +55,12 @@ switch_to_provider() {
         fi
     done
 
-    local selected_key=""
+    selected_key=""
     if [[ "$selection" =~ ^[0-9]+$ ]]; then
-        if [[ "$selection" -lt 1 || "$selection" -gt ${#enabled_keys[@]} ]]; then
-            echo "Error: Invalid selection number. Available: 1-${#enabled_keys[@]}"
+        if [[ "$selection" -lt 1 ]] || \
+           [[ "$selection" -gt ${#enabled_keys[@]} ]]; then
+            echo "Error: Invalid selection number."
+            echo "Available: 1-${#enabled_keys[@]}"
             exit 1
         fi
         selected_key="${enabled_keys[$((selection-1))]}"
@@ -106,7 +111,9 @@ switch_to_provider() {
 }
 
 show_menu() {
-    enabled_keys=($(jq -r '.providers | to_entries[] | select(.value.enabled == true) | .key' "$CONFIG"))
+    enabled_keys=($(jq -r \
+        '.providers | to_entries[] | select(.value.enabled == true) | .key' \
+        "$CONFIG"))
 
     if [[ ${#enabled_keys[@]} -eq 0 ]]; then
         echo ""
@@ -146,10 +153,11 @@ show_menu() {
         else
             echo "  $i) $label"
         fi
-        echo "     Default: $default_model | Top model: $opus_model"
+        echo "     Default: $default_model"
+        echo "     Top model: $opus_model"
         echo "     URL: $base_url"
         echo ""
-        ((i++))
+        i=$((i + 1))
     done
 
     echo "  T) Toggle providers"
@@ -186,7 +194,11 @@ show_menu() {
         return
     fi
 
-    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
+    if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+        echo "Error: Invalid selection."
+        exit 1
+    fi
+    if [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
         echo "Error: Invalid selection."
         exit 1
     fi
@@ -260,7 +272,8 @@ add_provider() {
             fi
         done
         if [[ "$key_exists" == "true" ]]; then
-            echo "Error: Provider '$new_key' already exists. Choose a different key."
+            echo "Error: Provider '$new_key' already exists."
+            echo "Choose a different key."
             continue
         fi
         break
@@ -321,30 +334,31 @@ add_provider() {
     # Write to config
     tmp=$(mktemp)
     jq --arg key "$new_key" \
-       --arg label "$new_label" \
-       --arg token "$new_token" \
-       --arg url "$new_url" \
-       --arg haiku "$new_haiku" \
-       --arg sonnet "$new_sonnet" \
-       --arg opus "$new_opus" \
-       --arg default "$new_default" \
-       '.providers[$key] = {
-           "label": $label,
-           "enabled": true,
-           "auth_token": $token,
-           "base_url": $url,
-           "haiku_model": $haiku,
-           "sonnet_model": $sonnet,
-           "opus_model": $opus,
-           "default_model": $default
-       }' "$CONFIG" > "$tmp"
+        --arg label "$new_label" \
+        --arg token "$new_token" \
+        --arg url "$new_url" \
+        --arg haiku "$new_haiku" \
+        --arg sonnet "$new_sonnet" \
+        --arg opus "$new_opus" \
+        --arg default "$new_default" \
+        '.providers[$key] = {
+            "label": $label,
+            "enabled": true,
+            "auth_token": $token,
+            "base_url": $url,
+            "haiku_model": $haiku,
+            "sonnet_model": $sonnet,
+            "opus_model": $opus,
+            "default_model": $default
+        }' "$CONFIG" > "$tmp"
     mv "$tmp" "$CONFIG"
 
     echo ""
     echo "Provider '$new_label' added and enabled."
     echo "  Key: $new_key"
     echo "  URL: $new_url"
-    echo "  Default: $new_default | Haiku: $new_haiku | Sonnet: $new_sonnet | Opus: $new_opus"
+    echo "  Default: $new_default"
+    echo "  Haiku: $new_haiku | Sonnet: $new_sonnet | Opus: $new_opus"
     echo ""
 }
 
@@ -373,7 +387,7 @@ remove_provider() {
             else
                 echo "  $i) $label  [disabled]"
             fi
-            ((i++))
+            i=$((i + 1))
         done
 
         echo "  0) Cancel"
@@ -386,7 +400,11 @@ remove_provider() {
             exit 0
         fi
 
-        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
+        if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+            echo "Error: Invalid selection."
+            exit 1
+        fi
+        if [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
             echo "Error: Invalid selection."
             exit 1
         fi
@@ -417,7 +435,7 @@ remove_provider() {
     if [[ "$current_base_url" == "$url" ]]; then
         echo ""
         echo "Error: '$label' is the currently active provider."
-        echo "Switch to another provider before removing it. Run: ccs"
+        echo "Switch to another provider first. Run: ccs"
         exit 1
     fi
 
@@ -468,7 +486,7 @@ modify_provider() {
             else
                 echo "  $i) $label  [disabled]"
             fi
-            ((i++))
+            i=$((i + 1))
         done
 
         echo "  0) Cancel"
@@ -481,7 +499,11 @@ modify_provider() {
             exit 0
         fi
 
-        if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
+        if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+            echo "Error: Invalid selection."
+            exit 1
+        fi
+        if [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
             echo "Error: Invalid selection."
             exit 1
         fi
@@ -501,7 +523,9 @@ modify_provider() {
         fi
     fi
 
-    local cur_label cur_token cur_url cur_haiku cur_sonnet cur_opus cur_default cur_enabled
+    local cur_label cur_token cur_url
+    local cur_haiku cur_sonnet cur_opus
+    local cur_default cur_enabled
     cur_label=$(jq -r ".providers.$target.label" "$CONFIG")
     cur_token=$(jq -r ".providers.$target.auth_token" "$CONFIG")
     cur_url=$(jq -r ".providers.$target.base_url" "$CONFIG")
@@ -538,7 +562,9 @@ modify_provider() {
     new_opus="${new_opus:-$cur_opus}"
 
     while true; do
-        read -rp "Default model tier (haiku/sonnet/opus) [$cur_default]: " new_default
+        read -rp \
+            "Default model tier (haiku/sonnet/opus) [$cur_default]: " \
+            new_default
         new_default="${new_default:-$cur_default}"
         case "$new_default" in
             haiku|sonnet|opus) break ;;
@@ -557,14 +583,30 @@ modify_provider() {
 
     echo ""
     echo "Changes for '$target':"
-    [[ "$new_label" != "$cur_label" ]] && echo "  label: $cur_label -> $new_label"
-    [[ "$new_token" != "$cur_token" ]] && echo "  auth_token: ********** -> **********"
-    [[ "$new_url" != "$cur_url" ]] && echo "  base_url: $cur_url -> $new_url"
-    [[ "$new_haiku" != "$cur_haiku" ]] && echo "  haiku_model: $cur_haiku -> $new_haiku"
-    [[ "$new_sonnet" != "$cur_sonnet" ]] && echo "  sonnet_model: $cur_sonnet -> $new_sonnet"
-    [[ "$new_opus" != "$cur_opus" ]] && echo "  opus_model: $cur_opus -> $new_opus"
-    [[ "$new_default" != "$cur_default" ]] && echo "  default_model: $cur_default -> $new_default"
-    [[ "$new_enabled" != "$cur_enabled" ]] && echo "  enabled: $cur_enabled -> $new_enabled"
+    if [[ "$new_label" != "$cur_label" ]]; then
+        echo "  label: $cur_label -> $new_label"
+    fi
+    if [[ "$new_token" != "$cur_token" ]]; then
+        echo "  auth_token: ********** -> **********"
+    fi
+    if [[ "$new_url" != "$cur_url" ]]; then
+        echo "  base_url: $cur_url -> $new_url"
+    fi
+    if [[ "$new_haiku" != "$cur_haiku" ]]; then
+        echo "  haiku_model: $cur_haiku -> $new_haiku"
+    fi
+    if [[ "$new_sonnet" != "$cur_sonnet" ]]; then
+        echo "  sonnet_model: $cur_sonnet -> $new_sonnet"
+    fi
+    if [[ "$new_opus" != "$cur_opus" ]]; then
+        echo "  opus_model: $cur_opus -> $new_opus"
+    fi
+    if [[ "$new_default" != "$cur_default" ]]; then
+        echo "  default_model: $cur_default -> $new_default"
+    fi
+    if [[ "$new_enabled" != "$cur_enabled" ]]; then
+        echo "  enabled: $cur_enabled -> $new_enabled"
+    fi
 
     echo ""
     read -rp "Apply changes? [y/N]: " confirm
@@ -575,24 +617,24 @@ modify_provider() {
 
     tmp=$(mktemp)
     jq --arg key "$target" \
-       --arg label "$new_label" \
-       --arg token "$new_token" \
-       --arg url "$new_url" \
-       --arg haiku "$new_haiku" \
-       --arg sonnet "$new_sonnet" \
-       --arg opus "$new_opus" \
-       --arg default "$new_default" \
-       --argjson enabled "$new_enabled" \
-       '.providers[$key] = {
-           "label": $label,
-           "enabled": $enabled,
-           "auth_token": $token,
-           "base_url": $url,
-           "haiku_model": $haiku,
-           "sonnet_model": $sonnet,
-           "opus_model": $opus,
-           "default_model": $default
-       }' "$CONFIG" > "$tmp"
+        --arg label "$new_label" \
+        --arg token "$new_token" \
+        --arg url "$new_url" \
+        --arg haiku "$new_haiku" \
+        --arg sonnet "$new_sonnet" \
+        --arg opus "$new_opus" \
+        --arg default "$new_default" \
+        --argjson enabled "$new_enabled" \
+        '.providers[$key] = {
+            "label": $label,
+            "enabled": $enabled,
+            "auth_token": $token,
+            "base_url": $url,
+            "haiku_model": $haiku,
+            "sonnet_model": $sonnet,
+            "opus_model": $opus,
+            "default_model": $default
+        }' "$CONFIG" > "$tmp"
     mv "$tmp" "$CONFIG"
 
     echo ""
@@ -616,14 +658,16 @@ show_current() {
             echo ""
             echo "  $label ($key)"
             echo "  URL: $url"
-            echo "  Default: $dm | Top model: $om"
+            echo "  Default: $dm"
+            echo "  Top model: $om"
             echo ""
             return
         fi
     done
 
     echo ""
-    echo "  No active provider found (current URL: $current_base_url)"
+    echo "  No active provider found"
+    echo "  Current URL: $current_base_url"
     echo ""
 }
 
@@ -643,7 +687,7 @@ toggle_providers() {
         else
             echo "  $i) $label  [disabled]"
         fi
-        ((i++))
+        i=$((i + 1))
     done
 
     echo "  0) Back"
@@ -656,7 +700,11 @@ toggle_providers() {
         return
     fi
 
-    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
+    if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+        echo "Error: Invalid selection."
+        exit 1
+    fi
+    if [[ "$choice" -lt 1 || "$choice" -ge "$i" ]]; then
         echo "Error: Invalid selection."
         exit 1
     fi
@@ -688,9 +736,10 @@ toggle_providers() {
 }
 
 show_version() {
-    local version_file="$(cd "$(dirname "$0")" && pwd)/VERSION"
+    local version_file
+    version_file="$(cd "$(dirname "$0")" && pwd)/VERSION"
     if [[ -f "$version_file" ]]; then
-        echo "ccs $(cat "$version_file" | tr -d '[:space:]')"
+        echo "ccs $(tr -d '[:space:]' < "$version_file")"
     else
         echo "ccs (version unknown)"
     fi
