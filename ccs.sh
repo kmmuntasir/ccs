@@ -596,6 +596,30 @@ modify_provider() {
     echo ""
 }
 
+show_current() {
+    local current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
+    all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
+
+    for key in "${all_keys[@]}"; do
+        local url=$(jq -r ".providers.$key.base_url" "$CONFIG")
+        if [[ "$current_base_url" == "$url" ]]; then
+            local label=$(jq -r ".providers.$key.label" "$CONFIG")
+            local dm=$(jq -r ".providers.$key.default_model" "$CONFIG")
+            local om=$(jq -r ".providers.$key.opus_model" "$CONFIG")
+            echo ""
+            echo "  $label ($key)"
+            echo "  URL: $url"
+            echo "  Default: $dm | Top model: $om"
+            echo ""
+            return
+        fi
+    done
+
+    echo ""
+    echo "  No active provider found (current URL: $current_base_url)"
+    echo ""
+}
+
 toggle_providers() {
     all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
 
@@ -688,6 +712,8 @@ if [[ $# -gt 0 ]]; then
         modify_provider "$2"
     elif [[ "$arg" == "remove" ]]; then
         remove_provider "$2"
+    elif [[ "$arg" == "current" ]]; then
+        show_current
     else
         switch_to_provider "$arg"
     fi

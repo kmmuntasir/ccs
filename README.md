@@ -73,6 +73,7 @@ ccs modify        # Select and modify a provider interactively
 ccs modify glm    # Modify a specific provider by key
 ccs remove        # Select and remove a provider interactively
 ccs remove glm    # Remove a specific provider by key
+ccs current       # Show the currently active provider
 ```
 
 ### Configuration
