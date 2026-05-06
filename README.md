@@ -5,9 +5,20 @@ A command-line utility to switch between different Claude API providers in Claud
 ## Requirements
 
 - [jq](https://jqlang.github.io/jq/) - JSON processor (installed automatically by the installer)
+- [git](https://git-scm.com/) - required for both quick install and manual install method.
 - Claude Code CLI installed
 
 ## Installation
+
+### Quick Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kmmuntasir/ccs/main/quick-install.sh | bash
+```
+
+Then restart your shell or run `source ~/.bashrc` (or `source ~/.zshrc`, or `source ~/.config/fish/config.fish` for Fish) to enable the `ccs` command.
+
+### Manual Install
 
 ```bash
 git clone https://github.com/kmmuntasir/ccs.git
@@ -17,7 +28,7 @@ cd ccs
 
 Restart your shell or run `source ~/.bashrc` (or `source ~/.zshrc`, or `source ~/.config/fish/config.fish` for Fish) to enable the `ccs` command.
 
-Or manually or for a different shell:
+Or manually:
 
 ```bash
 mkdir -p ~/.ccs
