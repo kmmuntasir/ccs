@@ -4,6 +4,106 @@ CCS_DIR="$HOME/.ccs"
 CONFIG="$CCS_DIR/config.json"
 SETTINGS="$HOME/.claude/settings.json"
 
+switch_to_provider() {
+    local selection="$1"
+    enabled_keys=($(jq -r '.providers | to_entries[] | select(.value.enabled == true) | .key' "$CONFIG"))
+    all_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
+
+    if [[ ${#enabled_keys[@]} -eq 0 ]]; then
+        echo "Error: No providers enabled. Run 'ccs T' to enable a provider."
+        exit 1
+    fi
+
+    local selected_key=""
+    local target_exists=false
+    for key in "${all_keys[@]}"; do
+        if [[ "$key" == "$selection" ]]; then
+            target_exists=true
+            break
+        fi
+    done
+
+    if [[ "$target_exists" == "false" ]]; then
+        echo "Error: Unknown provider '$selection'"
+        exit 1
+    fi
+
+    local is_enabled=false
+    for key in "${enabled_keys[@]}"; do
+        if [[ "$key" == "$selection" ]]; then
+            is_enabled=true
+            break
+        fi
+    done
+
+    if [[ "$is_enabled" == "false" ]]; then
+        echo "Error: Provider '$selection' is disabled. Run 'ccs T' to enable it."
+        exit 1
+    fi
+
+    current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
+    current_provider="unknown"
+    for key in "${enabled_keys[@]}"; do
+        provider_url=$(jq -r ".providers.$key.base_url" "$CONFIG")
+        if [[ "$current_base_url" == "$provider_url" ]]; then
+            current_provider="$key"
+            break
+        fi
+    done
+
+    local selected_key=""
+    if [[ "$selection" =~ ^[0-9]+$ ]]; then
+        if [[ "$selection" -lt 1 || "$selection" -gt ${#enabled_keys[@]} ]]; then
+            echo "Error: Invalid selection number. Available: 1-${#enabled_keys[@]}"
+            exit 1
+        fi
+        selected_key="${enabled_keys[$((selection-1))]}"
+    else
+        selected_key="$selection"
+    fi
+
+    if [[ "$selected_key" == "$current_provider" ]]; then
+        echo "Already using '$selected_key'. No change needed."
+        exit 0
+    fi
+
+    auth_token=$(jq -r ".providers.$selected_key.auth_token" "$CONFIG")
+    base_url=$(jq -r ".providers.$selected_key.base_url" "$CONFIG")
+    haiku=$(jq -r ".providers.$selected_key.haiku_model" "$CONFIG")
+    sonnet=$(jq -r ".providers.$selected_key.sonnet_model" "$CONFIG")
+    opus=$(jq -r ".providers.$selected_key.opus_model" "$CONFIG")
+    default_model=$(jq -r ".providers.$selected_key.default_model" "$CONFIG")
+
+    tmp=$(mktemp)
+    jq --arg tok "$auth_token" \
+       --arg url "$base_url" \
+       --arg hk "$haiku" \
+       --arg sn "$sonnet" \
+       --arg op "$opus" \
+       --arg dm "$default_model" \
+       '.env.ANTHROPIC_AUTH_TOKEN = $tok |
+        .env.ANTHROPIC_BASE_URL = $url |
+        .env.ANTHROPIC_DEFAULT_HAIKU_MODEL = $hk |
+        .env.ANTHROPIC_DEFAULT_SONNET_MODEL = $sn |
+        .env.ANTHROPIC_DEFAULT_OPUS_MODEL = $op |
+        .model = $dm' "$SETTINGS" > "$tmp"
+
+    mv "$tmp" "$SETTINGS"
+
+    label=$(jq -r ".providers.$selected_key.label" "$CONFIG")
+    echo ""
+    echo "Switched to: $label"
+    echo "Updated fields:"
+    echo "  ANTHROPIC_AUTH_TOKEN: **********"
+    echo "  ANTHROPIC_BASE_URL: $base_url"
+    echo "  HAIKU_MODEL: $haiku"
+    echo "  SONNET_MODEL: $sonnet"
+    echo "  OPUS_MODEL: $opus"
+    echo "  model: $default_model"
+    echo ""
+    echo "Restart Claude Code for changes to take effect."
+}
+
 show_menu() {
     enabled_keys=($(jq -r '.providers | to_entries[] | select(.value.enabled == true) | .key' "$CONFIG"))
 
@@ -198,4 +298,13 @@ if [[ ${#keys[@]} -eq 0 ]]; then
     exit 1
 fi
 
-show_menu
+if [[ $# -gt 0 ]]; then
+    arg="$1"
+    if [[ "$arg" == "T" || "$arg" == "t" ]]; then
+        toggle_providers
+    else
+        switch_to_provider "$arg"
+    fi
+else
+    show_menu
+fi

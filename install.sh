@@ -5,7 +5,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CCS_DIR="$HOME/.ccs"
 CLAUDE_DIR="$HOME/.claude"
-ALIAS_LINE='alias ccs="~/.ccs/switch.sh"'
+ALIAS_LINE='ccs() { ~/.ccs/switch.sh "$@"; }'
 
 add_alias() {
     local rc_file="$1"
@@ -13,12 +13,12 @@ add_alias() {
         return
     fi
 
-    if grep -q 'alias ccs=' "$rc_file" 2>/dev/null; then
-        echo "Alias already exists in $rc_file. Skipping."
+    if grep -q '^ccs()' "$rc_file" 2>/dev/null; then
+        echo "ccs function already exists in $rc_file. Skipping."
         return
     fi
 
-    echo "Adding alias to $rc_file..."
+    echo "Adding ccs function to $rc_file..."
     echo "" >> "$rc_file"
     echo "# CCS (Claude Code Switcher)" >> "$rc_file"
     echo "$ALIAS_LINE" >> "$rc_file"
@@ -94,8 +94,11 @@ echo "=============================="
 echo "  Installation complete!"
 echo "=============================="
 echo ""
-echo "Run: ccs (if shell is restarted)"
-echo "   or: ~/.ccs/switch.sh"
+echo "Usage:"
+echo "  ccs           - interactive menu"
+echo "  ccs glm       - switch to provider by key"
+echo "  ccs 2         - switch to provider by number"
+echo "  ccs T        - toggle providers"
 echo ""
-echo "Note: Edit ~/.ccs/config.json with your API keys."
+echo "Run: source ~/.bashrc (or restart shell) first, then use 'ccs'"
 echo ""
