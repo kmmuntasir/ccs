@@ -680,6 +680,28 @@ toggle_providers() {
     toggle_providers
 }
 
+show_help() {
+    echo "ccs - Claude Code Provider Switcher"
+    echo ""
+    echo "Usage: ccs [command]"
+    echo ""
+    echo "Commands:"
+    echo "  (none)          Interactive menu"
+    echo "  <key>           Switch to provider by key (e.g. glm, kimi)"
+    echo "  <number>        Switch to provider by menu number"
+    echo "  T               Toggle provider visibility"
+    echo "  add             Interactively add a new provider"
+    echo "  modify [key]    Modify a provider (interactive if no key given)"
+    echo "  remove [key]    Remove a provider (interactive if no key given)"
+    echo "  current         Show the currently active provider"
+    echo "  -h, --help      Show this help message"
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
 if ! command -v jq &>/dev/null; then
     echo "Error: jq is required but not installed."
     exit 1

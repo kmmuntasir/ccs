@@ -1,7 +1,7 @@
 {
   "providers": {
     "agentrouter": {
-      "label": "AgentRouter (Claude)",
+      "label": "AgentRouter",
       "enabled": false,
       "auth_token": "agentrouter-api-key",
       "base_url": "https://agentrouter.org/",
@@ -9,6 +9,46 @@
       "sonnet_model": "claude-sonnet-4-6",
       "opus_model": "claude-opus-4-6",
       "default_model": "haiku"
+    },
+    "anthropic": {
+      "label": "Anthropic (Native)",
+      "enabled": false,
+      "auth_token": "anthropic-api-key",
+      "base_url": "https://api.anthropic.com",
+      "haiku_model": "claude-haiku-4-5",
+      "sonnet_model": "claude-sonnet-4-6",
+      "opus_model": "claude-opus-4-7",
+      "default_model": "sonnet"
+    },
+    "braintrust": {
+      "label": "Braintrust (Gemini)",
+      "enabled": false,
+      "auth_token": "braintrust-api-key",
+      "base_url": "https://gateway.braintrust.dev",
+      "haiku_model": "gemini-2.5-flash",
+      "sonnet_model": "gemini-2.5-pro",
+      "opus_model": "gemini-3.1-pro-preview",
+      "default_model": "sonnet"
+    },
+    "deepseek": {
+      "label": "DeepSeek (DeepSeek)",
+      "enabled": false,
+      "auth_token": "deepseek-api-key",
+      "base_url": "https://api.deepseek.com/",
+      "haiku_model": "deepseek-v4-flash",
+      "sonnet_model": "deepseek-v4-pro",
+      "opus_model": "deepseek-v4-pro",
+      "default_model": "haiku"
+    },
+    "fireworks": {
+      "label": "Fireworks AI",
+      "enabled": false,
+      "auth_token": "fireworks-api-key",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "haiku_model": "accounts/fireworks/models/deepseek-v4-flash",
+      "sonnet_model": "accounts/fireworks/models/kimi-k2.6",
+      "opus_model": "accounts/fireworks/models/gpt-oss-120b",
+      "default_model": "sonnet"
     },
     "glm": {
       "label": "Z.AI (GLM)",
@@ -20,44 +60,54 @@
       "opus_model": "glm-5.1",
       "default_model": "opus"
     },
-    "deepseek": {
-      "label": "DeepSeek (DeepSeek)",
-      "enabled": false,
-      "auth_token": "deepseek-api-key",
-      "base_url": "https://api.deepseek.com/",
-      "haiku_model": "deepseek-haiku",
-      "sonnet_model": "deepseek-sonnet",
-      "opus_model": "deepseek-opus",
-      "default_model": "haiku"
-    },
     "kimi": {
       "label": "Moonshot (Kimi)",
       "enabled": false,
       "auth_token": "kimi-api-key",
       "base_url": "https://api.moonshot.cn/",
-      "haiku_model": "kimi-haiku",
-      "sonnet_model": "kimi-sonnet",
-      "opus_model": "kimi-opus",
+      "haiku_model": "kimi-k2.5",
+      "sonnet_model": "kimi-k2.6",
+      "opus_model": "kimi-k2-thinking",
       "default_model": "haiku"
     },
-    "qwen": {
-      "label": "Alibaba (Qwen)",
+    "litellm": {
+      "label": "LiteLLM (Local Proxy)",
       "enabled": false,
-      "auth_token": "qwen-api-key",
-      "base_url": "https://dashscope.aliyuncs.com/",
-      "haiku_model": "qwen-haiku",
-      "sonnet_model": "qwen-sonnet",
-      "opus_model": "qwen-opus",
-      "default_model": "haiku"
+      "auth_token": "sk-litellm-dummy-key",
+      "base_url": "http://127.0.0.1:4000",
+      "haiku_model": "bedrock-claude-haiku-4-5",
+      "sonnet_model": "bedrock-claude-sonnet-4-6",
+      "opus_model": "bedrock-claude-opus-4-7",
+      "default_model": "sonnet"
     },
     "minimax": {
       "label": "MiniMax (MiniMax)",
       "enabled": false,
       "auth_token": "minimax-api-key",
       "base_url": "https://api.minimax.chat/",
-      "haiku_model": "minimax-haiku",
-      "sonnet_model": "minimax-sonnet",
-      "opus_model": "minimax-opus",
+      "haiku_model": "minimax-m2",
+      "sonnet_model": "minimax-m2.1",
+      "opus_model": "minimax-m2.5",
+      "default_model": "haiku"
+    },
+    "openrouter": {
+      "label": "Openrouter",
+      "enabled": false,
+      "auth_token": "openrouter-api-key",
+      "base_url": "https://openrouter.ai/api/",
+      "haiku_model": "openai/gpt-oss-120b:free",
+      "sonnet_model": "minimax/minimax-m2.5:free",
+      "opus_model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "default_model": "opus"
+    },
+    "qwen": {
+      "label": "Alibaba (Qwen)",
+      "enabled": false,
+      "auth_token": "qwen-api-key",
+      "base_url": "https://dashscope.aliyuncs.com/",
+      "haiku_model": "qwen3-32b",
+      "sonnet_model": "qwen3-next-80b-a3b",
+      "opus_model": "qwen3-coder-480b-a35b-instruct",
       "default_model": "haiku"
     }
   }
