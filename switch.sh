@@ -106,7 +106,7 @@ show_menu() {
     echo ""
     echo "Switched to: $label"
     echo "Updated fields:"
-    echo "  ANTHROPIC_AUTH_TOKEN: $auth_token"
+    echo "  ANTHROPIC_AUTH_TOKEN: **********"
     echo "  ANTHROPIC_BASE_URL: $base_url"
     echo "  HAIKU_MODEL: $haiku"
     echo "  SONNET_MODEL: $sonnet"
