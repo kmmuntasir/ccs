@@ -409,6 +409,15 @@ remove_provider() {
     local url=$(jq -r ".providers.$target.base_url" "$CONFIG")
     local dm=$(jq -r ".providers.$target.default_model" "$CONFIG")
 
+    # Check if this is the currently active provider
+    local current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
+    if [[ "$current_base_url" == "$url" ]]; then
+        echo ""
+        echo "Error: '$label' is the currently active provider."
+        echo "Switch to another provider before removing it. Run: ccs"
+        exit 1
+    fi
+
     echo ""
     echo "About to remove:"
     echo "  Key: $target"
