@@ -1,0 +1,64 @@
+{
+  "providers": {
+    "agentrouter": {
+      "label": "AgentRouter (Claude)",
+      "enabled": false,
+      "auth_token": "agentrouter-api-key",
+      "base_url": "https://agentrouter.org/",
+      "haiku_model": "claude-haiku-4-5-20251001",
+      "sonnet_model": "claude-sonnet-4-6",
+      "opus_model": "claude-opus-4-6",
+      "default_model": "haiku"
+    },
+    "glm": {
+      "label": "Z.AI (GLM)",
+      "enabled": false,
+      "auth_token": "glm-api-key",
+      "base_url": "https://api.z.ai/api/anthropic",
+      "haiku_model": "glm-4.7",
+      "sonnet_model": "glm-5-turbo",
+      "opus_model": "glm-5.1",
+      "default_model": "opus"
+    },
+    "deepseek": {
+      "label": "DeepSeek (DeepSeek)",
+      "enabled": false,
+      "auth_token": "deepseek-api-key",
+      "base_url": "https://api.deepseek.com/",
+      "haiku_model": "deepseek-haiku",
+      "sonnet_model": "deepseek-sonnet",
+      "opus_model": "deepseek-opus",
+      "default_model": "haiku"
+    },
+    "kimi": {
+      "label": "Moonshot (Kimi)",
+      "enabled": false,
+      "auth_token": "kimi-api-key",
+      "base_url": "https://api.moonshot.cn/",
+      "haiku_model": "kimi-haiku",
+      "sonnet_model": "kimi-sonnet",
+      "opus_model": "kimi-opus",
+      "default_model": "haiku"
+    },
+    "qwen": {
+      "label": "Alibaba (Qwen)",
+      "enabled": false,
+      "auth_token": "qwen-api-key",
+      "base_url": "https://dashscope.aliyuncs.com/",
+      "haiku_model": "qwen-haiku",
+      "sonnet_model": "qwen-sonnet",
+      "opus_model": "qwen-opus",
+      "default_model": "haiku"
+    },
+    "minimax": {
+      "label": "MiniMax (MiniMax)",
+      "enabled": false,
+      "auth_token": "minimax-api-key",
+      "base_url": "https://api.minimax.chat/",
+      "haiku_model": "minimax-haiku",
+      "sonnet_model": "minimax-sonnet",
+      "opus_model": "minimax-opus",
+      "default_model": "haiku"
+    }
+  }
+}
