@@ -5,7 +5,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CCS_DIR="$HOME/.ccs"
 CLAUDE_DIR="$HOME/.claude"
-ALIAS_LINE='ccs() { ~/.ccs/switch.sh "$@"; }'
+ALIAS_LINE='ccs() { ~/.ccs/ccs.sh "$@"; }'
+UPDATED_RC_FILES=()
 
 add_alias() {
     local rc_file="$1"
@@ -22,6 +23,7 @@ add_alias() {
     echo "" >> "$rc_file"
     echo "# CCS (Claude Code Switcher)" >> "$rc_file"
     echo "$ALIAS_LINE" >> "$rc_file"
+    UPDATED_RC_FILES+=("$rc_file")
 }
 
 echo "=============================="
@@ -56,9 +58,9 @@ echo ""
 echo "Creating ~/.ccs/ directory..."
 mkdir -p "$CCS_DIR"
 
-echo "Copying switch.sh to ~/.ccs/..."
-cp "$SCRIPT_DIR/switch.sh" "$CCS_DIR/switch.sh"
-chmod +x "$CCS_DIR/switch.sh"
+echo "Copying ccs.sh to ~/.ccs/..."
+cp "$SCRIPT_DIR/ccs.sh" "$CCS_DIR/ccs.sh"
+chmod +x "$CCS_DIR/ccs.sh"
 
 if [[ ! -f "$CCS_DIR/config.json" ]]; then
     echo "Creating config.json from template..."
@@ -100,5 +102,13 @@ echo "  ccs glm       - switch to provider by key"
 echo "  ccs 2         - switch to provider by number"
 echo "  ccs T        - toggle providers"
 echo ""
-echo "Run: source ~/.bashrc (or restart shell) first, then use 'ccs'"
+
+if [[ ${#UPDATED_RC_FILES[@]} -gt 0 ]]; then
+    echo "Restart your shell or run:"
+    for f in "${UPDATED_RC_FILES[@]}"; do
+        echo "  source $f"
+    done
+else
+    echo "ccs function already configured. Just run 'ccs'"
+fi
 echo ""

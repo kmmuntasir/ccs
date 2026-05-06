@@ -17,13 +17,15 @@ cd ccs
 
 Restart your shell or run `source ~/.bashrc` (or `source ~/.zshrc`) to enable the `ccs` command.
 
-Or manually:
+Or manually or for a different shell:
 
 ```bash
 mkdir -p ~/.ccs
-cp switch.sh ~/.ccs/switch.sh
+cp ccs.sh ~/.ccs/ccs.sh
 cp config.template.json ~/.ccs/config.json
-chmod +x ~/.ccs/switch.sh
+chmod +x ~/.ccs/ccs.sh
+# Add to your shell config:
+# ccs() { ~/.ccs/ccs.sh "$@"; }
 ```
 
 ## Usage
@@ -101,6 +103,8 @@ Edit `~/.ccs/config.json`:
 
 ## Included Providers
 
+Template includes placeholders for:
+
 - **Z.AI (GLM)** - `https://api.z.ai/api/anthropic`
 - **AgentRouter (Claude)** - `https://agentrouter.org/`
 - **DeepSeek (DeepSeek)** - `https://api.deepseek.com/`
@@ -108,7 +112,7 @@ Edit `~/.ccs/config.json`:
 - **Alibaba (Qwen)** - `https://dashscope.aliyuncs.com/`
 - **MiniMax (MiniMax)** - `https://api.minimax.chat/`
 
-All providers are disabled by default. Enable them in `config.json` and add your API keys.
+All providers are disabled by default - enable them and add your API keys. Add more providers to `~/.ccs/config.json` as needed. 
 
 ## Claude Code Settings
 
@@ -132,10 +136,16 @@ Restart Claude Code after switching providers.
 ## Uninstallation
 
 ```bash
+./uninstall.sh
+```
+
+Or manually:
+
+```bash
 rm -rf ~/.ccs
 ```
 
-Note: This does not remove `~/.claude/settings.json` or shell config entries. Delete manually if desired.
+Note: This does not remove `~/.claude/settings.json` or shell config entries.
 
 ## License
 
