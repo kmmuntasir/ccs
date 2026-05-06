@@ -15,6 +15,8 @@ cd ccs
 ./install.sh
 ```
 
+Restart your shell or run `source ~/.bashrc` (or `source ~/.zshrc`) to enable the `ccs` command.
+
 Or manually:
 
 ```bash
@@ -26,13 +28,13 @@ chmod +x ~/.ccs/switch.sh
 
 ## Usage
 
-Run the switcher:
+### Interactive Menu
 
 ```bash
-~/.ccs/switch.sh
+ccs
 ```
 
-You'll see an interactive menu:
+Shows an interactive menu:
 
 ```
 ==============================
@@ -53,19 +55,17 @@ Available providers:
   0) Exit
 ```
 
-### Switching Providers
+### Command-Line Arguments
 
-1. Select a provider number to switch
-2. The script updates `~/.claude/settings.json`
-3. Restart Claude Code for changes to take effect
+Switch to a provider by key or number:
 
-### Enabling Providers
+```bash
+ccs glm       # Switch to provider by key
+ccs 2        # Switch to provider by number
+ccs T        # Toggle providers
+```
 
-1. Select `T` to enter toggle mode
-2. Select a provider number to enable/disable
-3. Only enabled providers appear in the main menu
-
-## Configuration
+### Configuration
 
 Edit `~/.ccs/config.json`:
 
@@ -135,7 +135,7 @@ Restart Claude Code after switching providers.
 rm -rf ~/.ccs
 ```
 
-Note: This does not remove `~/.claude/settings.json`. Delete manually if desired.
+Note: This does not remove `~/.claude/settings.json` or shell config entries. Delete manually if desired.
 
 ## License
 
