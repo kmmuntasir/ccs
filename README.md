@@ -139,4 +139,4 @@ Note: This does not remove `~/.claude/settings.json` or shell config entries. De
 
 ## License
 
-MIT
+GNU General Public License v3 (GPLv3)
