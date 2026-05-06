@@ -54,6 +54,7 @@ Available providers:
      URL: https://agentrouter.org/
 
   T) Toggle providers
+  +) Add provider
   0) Exit
 ```
 
@@ -63,8 +64,9 @@ Switch to a provider by key or number:
 
 ```bash
 ccs glm       # Switch to provider by key
-ccs 2        # Switch to provider by number
-ccs T        # Toggle providers
+ccs 2         # Switch to provider by number
+ccs T         # Toggle providers
+ccs add       # Interactively add a new provider
 ```
 
 ### Configuration
@@ -112,7 +114,7 @@ Template includes placeholders for:
 - **Alibaba (Qwen)** - `https://dashscope.aliyuncs.com/`
 - **MiniMax (MiniMax)** - `https://api.minimax.chat/`
 
-All providers are disabled by default - enable them and add your API keys. Add more providers to `~/.ccs/config.json` as needed. 
+All providers are disabled by default - enable them and add your API keys. Add more providers by running `ccs add` or editing `~/.ccs/config.json` directly.
 
 ## Claude Code Settings
 

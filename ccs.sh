@@ -152,6 +152,7 @@ show_menu() {
     done
 
     echo "  T) Toggle providers"
+    echo "  +) Add provider"
     echo "  0) Exit"
     echo ""
 
@@ -164,6 +165,11 @@ show_menu() {
 
     if [[ "$choice" == "T" || "$choice" == "t" ]]; then
         toggle_providers
+        return
+    fi
+
+    if [[ "$choice" == "+" ]]; then
+        add_provider
         return
     fi
 
@@ -214,6 +220,119 @@ show_menu() {
     echo "  model: $default_model"
     echo ""
     echo "Restart Claude Code for changes to take effect."
+}
+
+add_provider() {
+    existing_keys=($(jq -r '.providers | keys[]' "$CONFIG"))
+
+    echo ""
+    echo "=============================="
+    echo "  Add New Provider"
+    echo "=============================="
+    echo ""
+
+    # Provider key (unique identifier)
+    while true; do
+        read -rp "Provider key (lowercase, no spaces): " new_key
+        new_key=$(echo "$new_key" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+        if [[ -z "$new_key" ]]; then
+            echo "Error: Key cannot be empty."
+            continue
+        fi
+        local key_exists=false
+        for k in "${existing_keys[@]}"; do
+            if [[ "$k" == "$new_key" ]]; then
+                key_exists=true
+                break
+            fi
+        done
+        if [[ "$key_exists" == "true" ]]; then
+            echo "Error: Provider '$new_key' already exists. Choose a different key."
+            continue
+        fi
+        break
+    done
+
+    # Label
+    read -rp "Label (e.g. 'MyProvider (GPT)'): " new_label
+    if [[ -z "$new_label" ]]; then
+        new_label="$new_key"
+    fi
+
+    # Auth token
+    read -rp "Auth token (API key): " new_token
+    if [[ -z "$new_token" ]]; then
+        echo "Error: Auth token cannot be empty."
+        exit 1
+    fi
+
+    # Base URL
+    read -rp "Base URL: " new_url
+    if [[ -z "$new_url" ]]; then
+        echo "Error: Base URL cannot be empty."
+        exit 1
+    fi
+    # Ensure trailing slash
+    if [[ "${new_url: -1}" != "/" ]]; then
+        new_url="${new_url}/"
+    fi
+
+    # Model IDs
+    read -rp "Haiku model ID: " new_haiku
+    if [[ -z "$new_haiku" ]]; then
+        echo "Error: Haiku model ID cannot be empty."
+        exit 1
+    fi
+
+    read -rp "Sonnet model ID: " new_sonnet
+    if [[ -z "$new_sonnet" ]]; then
+        echo "Error: Sonnet model ID cannot be empty."
+        exit 1
+    fi
+
+    read -rp "Opus model ID: " new_opus
+    if [[ -z "$new_opus" ]]; then
+        echo "Error: Opus model ID cannot be empty."
+        exit 1
+    fi
+
+    # Default model
+    while true; do
+        read -rp "Default model tier (haiku/sonnet/opus): " new_default
+        case "$new_default" in
+            haiku|sonnet|opus) break ;;
+            *) echo "Error: Must be haiku, sonnet, or opus." ;;
+        esac
+    done
+
+    # Write to config
+    tmp=$(mktemp)
+    jq --arg key "$new_key" \
+       --arg label "$new_label" \
+       --arg token "$new_token" \
+       --arg url "$new_url" \
+       --arg haiku "$new_haiku" \
+       --arg sonnet "$new_sonnet" \
+       --arg opus "$new_opus" \
+       --arg default "$new_default" \
+       '.providers[$key] = {
+           "label": $label,
+           "enabled": true,
+           "auth_token": $token,
+           "base_url": $url,
+           "haiku_model": $haiku,
+           "sonnet_model": $sonnet,
+           "opus_model": $opus,
+           "default_model": $default
+       }' "$CONFIG" > "$tmp"
+    mv "$tmp" "$CONFIG"
+
+    echo ""
+    echo "Provider '$new_label' added and enabled."
+    echo "  Key: $new_key"
+    echo "  URL: $new_url"
+    echo "  Default: $new_default | Haiku: $new_haiku | Sonnet: $new_sonnet | Opus: $new_opus"
+    echo ""
 }
 
 toggle_providers() {
@@ -302,6 +421,8 @@ if [[ $# -gt 0 ]]; then
     arg="$1"
     if [[ "$arg" == "T" || "$arg" == "t" ]]; then
         toggle_providers
+    elif [[ "$arg" == "add" ]]; then
+        add_provider
     else
         switch_to_provider "$arg"
     fi
