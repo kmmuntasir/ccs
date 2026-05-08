@@ -45,16 +45,6 @@ switch_to_provider() {
         exit 1
     fi
 
-    current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
-    current_provider="unknown"
-    for key in "${enabled_keys[@]}"; do
-        provider_url=$(jq -r ".providers.$key.base_url" "$CONFIG")
-        if [[ "$current_base_url" == "$provider_url" ]]; then
-            current_provider="$key"
-            break
-        fi
-    done
-
     selected_key=""
     if [[ "$selection" =~ ^[0-9]+$ ]]; then
         if [[ "$selection" -lt 1 ]] || \
@@ -66,11 +56,6 @@ switch_to_provider() {
         selected_key="${enabled_keys[$((selection-1))]}"
     else
         selected_key="$selection"
-    fi
-
-    if [[ "$selected_key" == "$current_provider" ]]; then
-        echo "Already using '$selected_key'. No change needed."
-        exit 0
     fi
 
     auth_token=$(jq -r ".providers.$selected_key.auth_token" "$CONFIG")
@@ -220,11 +205,6 @@ show_menu() {
     fi
 
     selected_key="${enabled_keys[$((choice-1))]}"
-
-    if [[ "$selected_key" == "$current_provider" ]]; then
-        echo "Already using '$selected_key'. No change needed."
-        exit 0
-    fi
 
     auth_token=$(jq -r ".providers.$selected_key.auth_token" "$CONFIG")
     base_url=$(jq -r ".providers.$selected_key.base_url" "$CONFIG")
