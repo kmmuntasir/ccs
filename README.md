@@ -237,7 +237,7 @@ After switching, `~/.claude/settings.json` is updated with:
 ```
 
 The template also sets these optional env vars:
-- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — per-provider; set to `"1"` (disabled) or `"0"` (enabled) based on the provider's `disable1millionContextWindow` field
+- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — per-provider; set to `"1"` when disabled, removed entirely when 1M context is enabled
 - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` — blocks non-essential network requests
 - `DISABLE_TELEMETRY` — disables telemetry
 

@@ -68,12 +68,6 @@ switch_to_provider() {
     if [[ "$disable1m" == "null" ]]; then
         disable1m="true"
     fi
-    if [[ "$disable1m" == "true" ]]; then
-        disable1m_val="1"
-    else
-        disable1m_val="0"
-    fi
-
     tmp=$(mktemp)
     jq --arg tok "$auth_token" \
        --arg url "$base_url" \
@@ -81,14 +75,14 @@ switch_to_provider() {
        --arg sn "$sonnet" \
        --arg op "$opus" \
        --arg dm "$default_model" \
-       --arg d1m "$disable1m_val" \
+       --argjson d1m "$disable1m" \
        '.env.ANTHROPIC_AUTH_TOKEN = $tok |
         .env.ANTHROPIC_BASE_URL = $url |
         .env.ANTHROPIC_DEFAULT_HAIKU_MODEL = $hk |
         .env.ANTHROPIC_DEFAULT_SONNET_MODEL = $sn |
         .env.ANTHROPIC_DEFAULT_OPUS_MODEL = $op |
         .model = $dm |
-        .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = $d1m' "$SETTINGS" > "$tmp"
+        if $d1m then .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" else del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) end' "$SETTINGS" > "$tmp"
 
     mv "$tmp" "$SETTINGS"
 
@@ -216,12 +210,6 @@ show_menu() {
     if [[ "$disable1m" == "null" ]]; then
         disable1m="true"
     fi
-    if [[ "$disable1m" == "true" ]]; then
-        disable1m_val="1"
-    else
-        disable1m_val="0"
-    fi
-
     tmp=$(mktemp)
     jq --arg tok "$auth_token" \
        --arg url "$base_url" \
@@ -229,14 +217,14 @@ show_menu() {
        --arg sn "$sonnet" \
        --arg op "$opus" \
        --arg dm "$default_model" \
-       --arg d1m "$disable1m_val" \
+       --argjson d1m "$disable1m" \
        '.env.ANTHROPIC_AUTH_TOKEN = $tok |
         .env.ANTHROPIC_BASE_URL = $url |
         .env.ANTHROPIC_DEFAULT_HAIKU_MODEL = $hk |
         .env.ANTHROPIC_DEFAULT_SONNET_MODEL = $sn |
         .env.ANTHROPIC_DEFAULT_OPUS_MODEL = $op |
         .model = $dm |
-        .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = $d1m' "$SETTINGS" > "$tmp"
+        if $d1m then .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" else del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) end' "$SETTINGS" > "$tmp"
 
     mv "$tmp" "$SETTINGS"
 
