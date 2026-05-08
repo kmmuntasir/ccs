@@ -8,7 +8,8 @@
       "haiku_model": "claude-haiku-4-5-20251001",
       "sonnet_model": "claude-sonnet-4-6",
       "opus_model": "claude-opus-4-6",
-      "default_model": "haiku"
+      "default_model": "haiku",
+      "disable1millionContextWindow": false
     },
     "anthropic": {
       "label": "Anthropic (Native)",
@@ -18,7 +19,8 @@
       "haiku_model": "claude-haiku-4-5",
       "sonnet_model": "claude-sonnet-4-6",
       "opus_model": "claude-opus-4-7",
-      "default_model": "sonnet"
+      "default_model": "sonnet",
+      "disable1millionContextWindow": false
     },
     "braintrust": {
       "label": "Braintrust (Gemini)",
@@ -28,17 +30,19 @@
       "haiku_model": "gemini-2.5-flash",
       "sonnet_model": "gemini-2.5-pro",
       "opus_model": "gemini-3.1-pro-preview",
-      "default_model": "sonnet"
+      "default_model": "sonnet",
+      "disable1millionContextWindow": false
     },
     "deepseek": {
       "label": "DeepSeek (DeepSeek)",
       "enabled": false,
       "auth_token": "deepseek-api-key",
-      "base_url": "https://api.deepseek.com/",
+      "base_url": "https://api.deepseek.com/anthropic/",
       "haiku_model": "deepseek-v4-flash",
       "sonnet_model": "deepseek-v4-pro",
       "opus_model": "deepseek-v4-pro",
-      "default_model": "haiku"
+      "default_model": "haiku",
+      "disable1millionContextWindow": false
     },
     "fireworks": {
       "label": "Fireworks AI",
@@ -48,7 +52,8 @@
       "haiku_model": "accounts/fireworks/models/deepseek-v4-flash",
       "sonnet_model": "accounts/fireworks/models/kimi-k2.6",
       "opus_model": "accounts/fireworks/models/gpt-oss-120b",
-      "default_model": "sonnet"
+      "default_model": "sonnet",
+      "disable1millionContextWindow": false
     },
     "glm": {
       "label": "Z.AI (GLM)",
@@ -58,7 +63,8 @@
       "haiku_model": "glm-4.7",
       "sonnet_model": "glm-5-turbo",
       "opus_model": "glm-5.1",
-      "default_model": "opus"
+      "default_model": "opus",
+      "disable1millionContextWindow": false
     },
     "kimi": {
       "label": "Moonshot (Kimi)",
@@ -68,7 +74,8 @@
       "haiku_model": "kimi-k2.5",
       "sonnet_model": "kimi-k2.6",
       "opus_model": "kimi-k2-thinking",
-      "default_model": "haiku"
+      "default_model": "haiku",
+      "disable1millionContextWindow": false
     },
     "litellm": {
       "label": "LiteLLM (Local Proxy)",
@@ -78,7 +85,8 @@
       "haiku_model": "bedrock-claude-haiku-4-5",
       "sonnet_model": "bedrock-claude-sonnet-4-6",
       "opus_model": "bedrock-claude-opus-4-7",
-      "default_model": "sonnet"
+      "default_model": "sonnet",
+      "disable1millionContextWindow": false
     },
     "minimax": {
       "label": "MiniMax (MiniMax)",
@@ -88,7 +96,8 @@
       "haiku_model": "minimax-m2",
       "sonnet_model": "minimax-m2.1",
       "opus_model": "minimax-m2.5",
-      "default_model": "haiku"
+      "default_model": "haiku",
+      "disable1millionContextWindow": false
     },
     "openrouter": {
       "label": "Openrouter",
@@ -98,7 +107,8 @@
       "haiku_model": "openai/gpt-oss-120b:free",
       "sonnet_model": "minimax/minimax-m2.5:free",
       "opus_model": "nvidia/nemotron-3-super-120b-a12b:free",
-      "default_model": "opus"
+      "default_model": "opus",
+      "disable1millionContextWindow": false
     },
     "qwen": {
       "label": "Alibaba (Qwen)",
@@ -108,7 +118,8 @@
       "haiku_model": "qwen3-32b",
       "sonnet_model": "qwen3-next-80b-a3b",
       "opus_model": "qwen3-coder-480b-a35b-instruct",
-      "default_model": "haiku"
+      "default_model": "haiku",
+      "disable1millionContextWindow": false
     }
   }
 }
