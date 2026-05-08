@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - 2026-05-09
+
+### Added
+
+- 1M context window per-provider configuration (`use1MillionContextWindow`)
+- Schema migration script (`update.sh`) for upgrading config between versions
+- In-place update script (`quick-update.sh`) for updates without recloning
+
+### Fixed
+
+- DeepSeek base URL corrected
+- Allow re-apply of config when re-selecting active provider
+- Auto-apply `modify` changes to active provider immediately
+- Remove stale `CLAUDE_CODE_DISABLE_1M_CONTEXT` key when 1M context is enabled
+
 ## [1.0.0] - 2026-05-07
 
 ### Added
