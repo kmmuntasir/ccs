@@ -106,6 +106,24 @@ The installer will:
 - Create `~/.claude/settings.json` from template (skipped if already exists)
 - Add the `ccs` shell function to `~/.bashrc`, `~/.zshrc`, and `~/.config/fish/config.fish` (whichever exist)
 
+## Updating
+
+When you update CCS (via `git pull` or re-cloning), existing `~/.ccs/config.json` may lack new fields added in later versions. Running `install.sh` again will update the script but skip `config.json` to preserve your credentials. To patch `config.json` with any new fields:
+
+```bash
+cd ccs
+git pull
+./install.sh      # Updates ccs.sh, then runs update.sh automatically
+```
+
+Or run the updater directly:
+
+```bash
+./update.sh       # Patches config.json with missing fields, preserves existing values
+```
+
+`update.sh` is safe to run any time — it only adds fields that don't exist, never overwrites your credentials or custom settings.
+
 ## Usage
 
 ### Interactive Menu
@@ -154,7 +172,8 @@ Edit `~/.ccs/config.json`:
       "haiku_model": "glm-4.7",
       "sonnet_model": "glm-5-turbo",
       "opus_model": "glm-5.1",
-      "default_model": "opus"
+      "default_model": "opus",
+      "disable1millionContextWindow": true
     }
   }
 }
@@ -172,6 +191,7 @@ Edit `~/.ccs/config.json`:
 | `sonnet_model` | Model ID for Sonnet tier |
 | `opus_model` | Model ID for Opus tier |
 | `default_model` | Default tier (haiku/sonnet/opus) |
+| `disable1millionContextWindow` | `true` to disable 1M context window (default), `false` to enable it |
 
 `ccs modify` can change all fields including `enabled`, letting you toggle visibility without using the `T` menu.
 
@@ -185,7 +205,7 @@ Template includes 11 providers (all disabled by default — enable them and add 
 | **AgentRouter (Claude)** | `agentrouter` | `https://agentrouter.org/` |
 | **Anthropic (Native)** | `anthropic` | `https://api.anthropic.com` |
 | **Braintrust (Gemini)** | `braintrust` | `https://gateway.braintrust.dev` |
-| **DeepSeek (DeepSeek)** | `deepseek` | `https://api.deepseek.com/` |
+| **DeepSeek (DeepSeek)** | `deepseek` | `https://api.deepseek.com/anthropic/` |
 | **Fireworks AI** | `fireworks` | `https://api.fireworks.ai/inference/v1` |
 | **Moonshot (Kimi)** | `kimi` | `https://api.moonshot.cn/` |
 | **Alibaba (Qwen)** | `qwen` | `https://dashscope.aliyuncs.com/` |
@@ -217,11 +237,11 @@ After switching, `~/.claude/settings.json` is updated with:
 ```
 
 The template also sets these optional env vars:
-- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — disables 1M context window
+- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — per-provider; set to `"1"` (disabled) or `"0"` (enabled) based on the provider's `disable1millionContextWindow` field
 - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` — blocks non-essential network requests
 - `DISABLE_TELEMETRY` — disables telemetry
 
-These are set in the initial `settings.template.json` and are not modified by provider switching. Edit `~/.claude/settings.json` directly to change them.
+`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` and `DISABLE_TELEMETRY` are set in the initial `settings.template.json` and are not modified by provider switching. `CLAUDE_CODE_DISABLE_1M_CONTEXT` is managed automatically when you switch providers. Edit `~/.claude/settings.json` directly to change the others.
 
 Restart Claude Code after switching providers.
 

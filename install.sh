@@ -82,6 +82,10 @@ else
 fi
 
 echo ""
+echo "Running config updater to patch any missing fields..."
+"$SCRIPT_DIR/update.sh"
+echo ""
+
 echo "Adding 'ccs' alias to shell configuration files..."
 
 add_alias "$HOME/.bashrc"

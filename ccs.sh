@@ -79,7 +79,10 @@ switch_to_provider() {
     sonnet=$(jq -r ".providers.$selected_key.sonnet_model" "$CONFIG")
     opus=$(jq -r ".providers.$selected_key.opus_model" "$CONFIG")
     default_model=$(jq -r ".providers.$selected_key.default_model" "$CONFIG")
-    disable1m=$(jq -r ".providers.$selected_key.disable1millionContextWindow // false" "$CONFIG")
+    disable1m=$(jq -r ".providers.$selected_key.disable1millionContextWindow" "$CONFIG")
+    if [[ "$disable1m" == "null" ]]; then
+        disable1m="true"
+    fi
     if [[ "$disable1m" == "true" ]]; then
         disable1m_val="1"
     else
@@ -229,7 +232,10 @@ show_menu() {
     sonnet=$(jq -r ".providers.$selected_key.sonnet_model" "$CONFIG")
     opus=$(jq -r ".providers.$selected_key.opus_model" "$CONFIG")
     default_model=$(jq -r ".providers.$selected_key.default_model" "$CONFIG")
-    disable1m=$(jq -r ".providers.$selected_key.disable1millionContextWindow // false" "$CONFIG")
+    disable1m=$(jq -r ".providers.$selected_key.disable1millionContextWindow" "$CONFIG")
+    if [[ "$disable1m" == "null" ]]; then
+        disable1m="true"
+    fi
     if [[ "$disable1m" == "true" ]]; then
         disable1m_val="1"
     else
@@ -359,8 +365,8 @@ add_provider() {
 
     # Disable 1M context window
     while true; do
-        read -rp "Disable 1M context window? (true/false) [false]: " new_disable1m
-        new_disable1m="${new_disable1m:-false}"
+        read -rp "Disable 1M context window? (true/false) [true]: " new_disable1m
+        new_disable1m="${new_disable1m:-true}"
         case "$new_disable1m" in
             true|false) break ;;
             *) echo "Error: Must be true or false." ;;
@@ -399,6 +405,8 @@ add_provider() {
     echo "  Haiku: $new_haiku | Sonnet: $new_sonnet | Opus: $new_opus"
     if [[ "$new_disable1m" == "true" ]]; then
         echo "  1M context: DISABLED"
+    else
+        echo "  1M context: enabled"
     fi
     echo ""
 }
@@ -575,7 +583,10 @@ modify_provider() {
     cur_opus=$(jq -r ".providers.$target.opus_model" "$CONFIG")
     cur_default=$(jq -r ".providers.$target.default_model" "$CONFIG")
     cur_enabled=$(jq -r ".providers.$target.enabled" "$CONFIG")
-    cur_disable1m=$(jq -r ".providers.$target.disable1millionContextWindow // false" "$CONFIG")
+    cur_disable1m=$(jq -r ".providers.$target.disable1millionContextWindow" "$CONFIG")
+    if [[ "$cur_disable1m" == "null" ]]; then
+        cur_disable1m="true"
+    fi
 
     echo ""
     echo "Modifying: $cur_label ($target)"
