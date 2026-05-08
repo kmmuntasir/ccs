@@ -9,7 +9,7 @@
       "sonnet_model": "claude-sonnet-4-6",
       "opus_model": "claude-opus-4-6",
       "default_model": "haiku",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "anthropic": {
       "label": "Anthropic (Native)",
@@ -20,7 +20,7 @@
       "sonnet_model": "claude-sonnet-4-6",
       "opus_model": "claude-opus-4-7",
       "default_model": "sonnet",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "braintrust": {
       "label": "Braintrust (Gemini)",
@@ -31,7 +31,7 @@
       "sonnet_model": "gemini-2.5-pro",
       "opus_model": "gemini-3.1-pro-preview",
       "default_model": "sonnet",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "deepseek": {
       "label": "DeepSeek (DeepSeek)",
@@ -42,7 +42,7 @@
       "sonnet_model": "deepseek-v4-pro",
       "opus_model": "deepseek-v4-pro",
       "default_model": "haiku",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "fireworks": {
       "label": "Fireworks AI",
@@ -53,7 +53,7 @@
       "sonnet_model": "accounts/fireworks/models/kimi-k2.6",
       "opus_model": "accounts/fireworks/models/gpt-oss-120b",
       "default_model": "sonnet",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "glm": {
       "label": "Z.AI (GLM)",
@@ -64,7 +64,7 @@
       "sonnet_model": "glm-5-turbo",
       "opus_model": "glm-5.1",
       "default_model": "opus",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "kimi": {
       "label": "Moonshot (Kimi)",
@@ -75,7 +75,7 @@
       "sonnet_model": "kimi-k2.6",
       "opus_model": "kimi-k2-thinking",
       "default_model": "haiku",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "litellm": {
       "label": "LiteLLM (Local Proxy)",
@@ -86,7 +86,7 @@
       "sonnet_model": "bedrock-claude-sonnet-4-6",
       "opus_model": "bedrock-claude-opus-4-7",
       "default_model": "sonnet",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "minimax": {
       "label": "MiniMax (MiniMax)",
@@ -97,7 +97,7 @@
       "sonnet_model": "minimax-m2.1",
       "opus_model": "minimax-m2.5",
       "default_model": "haiku",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "openrouter": {
       "label": "Openrouter",
@@ -108,7 +108,7 @@
       "sonnet_model": "minimax/minimax-m2.5:free",
       "opus_model": "nvidia/nemotron-3-super-120b-a12b:free",
       "default_model": "opus",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     },
     "qwen": {
       "label": "Alibaba (Qwen)",
@@ -119,7 +119,7 @@
       "sonnet_model": "qwen3-next-80b-a3b",
       "opus_model": "qwen3-coder-480b-a35b-instruct",
       "default_model": "haiku",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     }
   }
 }

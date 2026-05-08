@@ -173,7 +173,7 @@ Edit `~/.ccs/config.json`:
       "sonnet_model": "glm-5-turbo",
       "opus_model": "glm-5.1",
       "default_model": "opus",
-      "disable1millionContextWindow": true
+      "use1MillionContextWindow": false
     }
   }
 }
@@ -191,7 +191,7 @@ Edit `~/.ccs/config.json`:
 | `sonnet_model` | Model ID for Sonnet tier |
 | `opus_model` | Model ID for Opus tier |
 | `default_model` | Default tier (haiku/sonnet/opus) |
-| `disable1millionContextWindow` | `true` to disable 1M context window (default), `false` to enable it |
+| `use1MillionContextWindow` | `true` to enable 1M context window for providers that support it, `false` to disable (default) |
 
 `ccs modify` can change all fields including `enabled`, letting you toggle visibility without using the `T` menu.
 
@@ -237,7 +237,7 @@ After switching, `~/.claude/settings.json` is updated with:
 ```
 
 The template also sets these optional env vars:
-- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — per-provider; set to `"1"` when disabled, removed entirely when 1M context is enabled
+- `CLAUDE_CODE_DISABLE_1M_CONTEXT` — managed per-provider via `use1MillionContextWindow`; set to `"1"` when 1M context is disabled, removed when enabled
 - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` — blocks non-essential network requests
 - `DISABLE_TELEMETRY` — disables telemetry
 

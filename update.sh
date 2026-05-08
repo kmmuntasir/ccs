@@ -23,16 +23,32 @@ fi
 
 PATCHED=false
 
-# Patch: add disable1millionContextWindow where missing (default true)
-all_have_field=$(jq -r '[.providers[] | has("disable1millionContextWindow")] | all' "$CONFIG")
-if [[ "$all_have_field" != "true" ]]; then
-    echo "Patching: adding 'disable1millionContextWindow' field..."
+# Migration: rename disable1millionContextWindow to use1MillionContextWindow and invert values
+any_has_old_field=$(jq -r '[.providers[] | has("disable1millionContextWindow")] | any' "$CONFIG")
+if [[ "$any_has_old_field" == "true" ]]; then
+    echo "Migrating: renaming 'disable1millionContextWindow' to 'use1MillionContextWindow'..."
     tmp=$(mktemp)
     jq '.providers |= with_entries(
-        .value += if .value | has("disable1millionContextWindow") then {} else {"disable1millionContextWindow": true} end
+        if .value | has("disable1millionContextWindow") then
+            .value.use1MillionContextWindow = (.value.disable1millionContextWindow | not) |
+            del(.value.disable1millionContextWindow)
+        else . end
     )' "$CONFIG" > "$tmp"
     mv "$tmp" "$CONFIG"
-    echo "  -> Added to providers that lacked it (default: true)."
+    echo "  -> Renamed and inverted values (disable=true -> use=false, disable=false -> use=true)."
+    PATCHED=true
+fi
+
+# Patch: add use1MillionContextWindow where missing (default false)
+all_have_field=$(jq -r '[.providers[] | has("use1MillionContextWindow")] | all' "$CONFIG")
+if [[ "$all_have_field" != "true" ]]; then
+    echo "Patching: adding 'use1MillionContextWindow' field..."
+    tmp=$(mktemp)
+    jq '.providers |= with_entries(
+        .value += if .value | has("use1MillionContextWindow") then {} else {"use1MillionContextWindow": false} end
+    )' "$CONFIG" > "$tmp"
+    mv "$tmp" "$CONFIG"
+    echo "  -> Added to providers that lacked it (default: false)."
     PATCHED=true
 fi
 

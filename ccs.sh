@@ -64,9 +64,9 @@ switch_to_provider() {
     sonnet=$(jq -r ".providers.$selected_key.sonnet_model" "$CONFIG")
     opus=$(jq -r ".providers.$selected_key.opus_model" "$CONFIG")
     default_model=$(jq -r ".providers.$selected_key.default_model" "$CONFIG")
-    disable1m=$(jq -r ".providers.$selected_key.disable1millionContextWindow" "$CONFIG")
-    if [[ "$disable1m" == "null" ]]; then
-        disable1m="true"
+    use1m=$(jq -r ".providers.$selected_key.use1MillionContextWindow" "$CONFIG")
+    if [[ "$use1m" == "null" ]]; then
+        use1m="false"
     fi
     tmp=$(mktemp)
     jq --arg tok "$auth_token" \
@@ -75,14 +75,14 @@ switch_to_provider() {
        --arg sn "$sonnet" \
        --arg op "$opus" \
        --arg dm "$default_model" \
-       --argjson d1m "$disable1m" \
+       --argjson use1m "$use1m" \
        '.env.ANTHROPIC_AUTH_TOKEN = $tok |
         .env.ANTHROPIC_BASE_URL = $url |
         .env.ANTHROPIC_DEFAULT_HAIKU_MODEL = $hk |
         .env.ANTHROPIC_DEFAULT_SONNET_MODEL = $sn |
         .env.ANTHROPIC_DEFAULT_OPUS_MODEL = $op |
         .model = $dm |
-        if $d1m then .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" else del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) end' "$SETTINGS" > "$tmp"
+        if $use1m then del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) else .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" end' "$SETTINGS" > "$tmp"
 
     mv "$tmp" "$SETTINGS"
 
@@ -96,10 +96,10 @@ switch_to_provider() {
     echo "  SONNET_MODEL: $sonnet"
     echo "  OPUS_MODEL: $opus"
     echo "  model: $default_model"
-    if [[ "$disable1m" == "true" ]]; then
-        echo "  1M context: DISABLED"
-    else
+    if [[ "$use1m" == "true" ]]; then
         echo "  1M context: enabled"
+    else
+        echo "  1M context: DISABLED"
     fi
     echo ""
     echo "Restart Claude Code for changes to take effect."
@@ -206,9 +206,9 @@ show_menu() {
     sonnet=$(jq -r ".providers.$selected_key.sonnet_model" "$CONFIG")
     opus=$(jq -r ".providers.$selected_key.opus_model" "$CONFIG")
     default_model=$(jq -r ".providers.$selected_key.default_model" "$CONFIG")
-    disable1m=$(jq -r ".providers.$selected_key.disable1millionContextWindow" "$CONFIG")
-    if [[ "$disable1m" == "null" ]]; then
-        disable1m="true"
+    use1m=$(jq -r ".providers.$selected_key.use1MillionContextWindow" "$CONFIG")
+    if [[ "$use1m" == "null" ]]; then
+        use1m="false"
     fi
     tmp=$(mktemp)
     jq --arg tok "$auth_token" \
@@ -217,14 +217,14 @@ show_menu() {
        --arg sn "$sonnet" \
        --arg op "$opus" \
        --arg dm "$default_model" \
-       --argjson d1m "$disable1m" \
+       --argjson use1m "$use1m" \
        '.env.ANTHROPIC_AUTH_TOKEN = $tok |
         .env.ANTHROPIC_BASE_URL = $url |
         .env.ANTHROPIC_DEFAULT_HAIKU_MODEL = $hk |
         .env.ANTHROPIC_DEFAULT_SONNET_MODEL = $sn |
         .env.ANTHROPIC_DEFAULT_OPUS_MODEL = $op |
         .model = $dm |
-        if $d1m then .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" else del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) end' "$SETTINGS" > "$tmp"
+        if $use1m then del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) else .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" end' "$SETTINGS" > "$tmp"
 
     mv "$tmp" "$SETTINGS"
 
@@ -238,10 +238,10 @@ show_menu() {
     echo "  SONNET_MODEL: $sonnet"
     echo "  OPUS_MODEL: $opus"
     echo "  model: $default_model"
-    if [[ "$disable1m" == "true" ]]; then
-        echo "  1M context: DISABLED"
-    else
+    if [[ "$use1m" == "true" ]]; then
         echo "  1M context: enabled"
+    else
+        echo "  1M context: DISABLED"
     fi
     echo ""
     echo "Restart Claude Code for changes to take effect."
@@ -331,11 +331,11 @@ add_provider() {
         esac
     done
 
-    # Disable 1M context window
+    # Use 1M context window
     while true; do
-        read -rp "Disable 1M context window? (true/false) [true]: " new_disable1m
-        new_disable1m="${new_disable1m:-true}"
-        case "$new_disable1m" in
+        read -rp "Use 1M context window? (true/false) [false]: " new_use1m
+        new_use1m="${new_use1m:-false}"
+        case "$new_use1m" in
             true|false) break ;;
             *) echo "Error: Must be true or false." ;;
         esac
@@ -351,7 +351,7 @@ add_provider() {
         --arg sonnet "$new_sonnet" \
         --arg opus "$new_opus" \
         --arg default "$new_default" \
-        --argjson disable1m "$new_disable1m" \
+        --argjson use1m "$new_use1m" \
         '.providers[$key] = {
             "label": $label,
             "enabled": true,
@@ -361,7 +361,7 @@ add_provider() {
             "sonnet_model": $sonnet,
             "opus_model": $opus,
             "default_model": $default,
-            "disable1millionContextWindow": $disable1m
+            "use1MillionContextWindow": $use1m
         }' "$CONFIG" > "$tmp"
     mv "$tmp" "$CONFIG"
 
@@ -371,10 +371,10 @@ add_provider() {
     echo "  URL: $new_url"
     echo "  Default: $new_default"
     echo "  Haiku: $new_haiku | Sonnet: $new_sonnet | Opus: $new_opus"
-    if [[ "$new_disable1m" == "true" ]]; then
-        echo "  1M context: DISABLED"
-    else
+    if [[ "$new_use1m" == "true" ]]; then
         echo "  1M context: enabled"
+    else
+        echo "  1M context: DISABLED"
     fi
     echo ""
 }
@@ -542,7 +542,7 @@ modify_provider() {
 
     local cur_label cur_token cur_url
     local cur_haiku cur_sonnet cur_opus
-    local cur_default cur_enabled cur_disable1m
+    local cur_default cur_enabled cur_use1m
     cur_label=$(jq -r ".providers.$target.label" "$CONFIG")
     cur_token=$(jq -r ".providers.$target.auth_token" "$CONFIG")
     cur_url=$(jq -r ".providers.$target.base_url" "$CONFIG")
@@ -551,9 +551,9 @@ modify_provider() {
     cur_opus=$(jq -r ".providers.$target.opus_model" "$CONFIG")
     cur_default=$(jq -r ".providers.$target.default_model" "$CONFIG")
     cur_enabled=$(jq -r ".providers.$target.enabled" "$CONFIG")
-    cur_disable1m=$(jq -r ".providers.$target.disable1millionContextWindow" "$CONFIG")
-    if [[ "$cur_disable1m" == "null" ]]; then
-        cur_disable1m="true"
+    cur_use1m=$(jq -r ".providers.$target.use1MillionContextWindow" "$CONFIG")
+    if [[ "$cur_use1m" == "null" ]]; then
+        cur_use1m="false"
     fi
 
     echo ""
@@ -602,9 +602,9 @@ modify_provider() {
         new_enabled="$cur_enabled"
     fi
 
-    local disable1m_str="$cur_disable1m"
-    read -rp "Disable 1M context window? (true/false) [$disable1m_str]: " new_disable1m
-    new_disable1m="${new_disable1m:-$cur_disable1m}"
+    local use1m_str="$cur_use1m"
+    read -rp "Use 1M context window? (true/false) [$use1m_str]: " new_use1m
+    new_use1m="${new_use1m:-$cur_use1m}"
 
     echo ""
     echo "Changes for '$target':"
@@ -632,8 +632,8 @@ modify_provider() {
     if [[ "$new_enabled" != "$cur_enabled" ]]; then
         echo "  enabled: $cur_enabled -> $new_enabled"
     fi
-    if [[ "$new_disable1m" != "$cur_disable1m" ]]; then
-        echo "  disable1millionContextWindow: $cur_disable1m -> $new_disable1m"
+    if [[ "$new_use1m" != "$cur_use1m" ]]; then
+        echo "  use1MillionContextWindow: $cur_use1m -> $new_use1m"
     fi
 
     echo ""
@@ -653,7 +653,7 @@ modify_provider() {
         --arg opus "$new_opus" \
         --arg default "$new_default" \
         --argjson enabled "$new_enabled" \
-        --argjson disable1m "$new_disable1m" \
+        --argjson use1m "$new_use1m" \
         '.providers[$key] = {
             "label": $label,
             "enabled": $enabled,
@@ -663,9 +663,33 @@ modify_provider() {
             "sonnet_model": $sonnet,
             "opus_model": $opus,
             "default_model": $default,
-            "disable1millionContextWindow": $disable1m
+            "use1MillionContextWindow": $use1m
         }' "$CONFIG" > "$tmp"
     mv "$tmp" "$CONFIG"
+
+    # If this is the currently active provider, apply changes to settings.json too
+    local current_base_url
+    current_base_url=$(jq -r '.env.ANTHROPIC_BASE_URL' "$SETTINGS")
+    if [[ "$current_base_url" == "$cur_url" ]]; then
+        tmp=$(mktemp)
+        jq --arg tok "$new_token" \
+           --arg url "$new_url" \
+           --arg hk "$new_haiku" \
+           --arg sn "$new_sonnet" \
+           --arg op "$new_opus" \
+           --arg dm "$new_default" \
+           --argjson use1m "$new_use1m" \
+           '.env.ANTHROPIC_AUTH_TOKEN = $tok |
+            .env.ANTHROPIC_BASE_URL = $url |
+            .env.ANTHROPIC_DEFAULT_HAIKU_MODEL = $hk |
+            .env.ANTHROPIC_DEFAULT_SONNET_MODEL = $sn |
+            .env.ANTHROPIC_DEFAULT_OPUS_MODEL = $op |
+            .model = $dm |
+            if $use1m then del(.env.CLAUDE_CODE_DISABLE_1M_CONTEXT) else .env.CLAUDE_CODE_DISABLE_1M_CONTEXT = "1" end' "$SETTINGS" > "$tmp"
+        mv "$tmp" "$SETTINGS"
+        echo ""
+        echo "  Settings applied to active provider."
+    fi
 
     echo ""
     echo "Updated: $new_label ($target)"
